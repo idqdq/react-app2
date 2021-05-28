@@ -4,29 +4,29 @@ import Form from './Form'
 
 class App extends Component {
     state = {
-        characters: [],
+        evpnData: [],
     }
 
-    removeCharacter = index => {
-        const { characters } = this.state;
+    evpnRemove = index => {
+        const { evpnData } = this.state;
 
         this.setState({
-            characters: characters.filter((char, i) => {
+            evpnData: evpnData.filter((char, i) => {
                 return i !== index;
             })
         });
     }
 
-    handleSubmit = character => {
-        this.setState({characters: [...this.state.characters, character]});
+    handleSubmit = evpn => {
+        this.setState({evpnData: [...this.state.evpnData, evpn]});
     }
 
     render() {
-        const { characters } = this.state
+        const { evpnData } = this.state
 
         return (
             <div className="container">
-                <Table characterData={characters} removeCharacter={this.removeCharacter} />
+                <Table evpnData={evpnData} evpnRemove={this.evpnRemove} />
                 <Form handleSubmit={this.handleSubmit}/>
             </div>
         )
