@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 const Lines = (props) => {
     const elements = props.elements.map((el, index) => {
         return (
-            <div className="inline-block button" onClick={() => props.handle(index)}>{el}</div>
+            <div key={index} className="inline-block button" onClick={() => props.handle(index)}>{el}</div>
         )
     })
     return <div className="block">{elements}</div>
