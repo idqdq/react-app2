@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react'
 import Table from './Table'
-//import Form from './Form'
 import MyModal from './Modal';
 
 class App extends Component {
@@ -20,8 +19,7 @@ class App extends Component {
     hideModal = () => {
         this.setState({
             isOpen: false
-        });
-        delete this.state.evpn;
+        });        
         delete this.state.index;
     };
 
@@ -36,8 +34,7 @@ class App extends Component {
     }
 
     evpnEdit = index => {
-        this.setState({
-            evpn: this.state.evpnData[index], // temporary evpn data that serves both as a flag and a data
+        this.setState({            
             index: index,
         })
 
@@ -58,13 +55,13 @@ class App extends Component {
     }
 
     render() {
-        const { evpnData, evpn, index } = this.state
+        const { evpnData, index } = this.state
          
         return (
             <div className="container">
                 <Table evpnData={evpnData} evpnRemove={this.evpnRemove} evpnEdit={this.evpnEdit}/>
                 <button onClick={this.openModal}>New</button>
-                <MyModal evpn={evpn} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
+                <MyModal evpn={evpnData[index]} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
             </div>
         )
     }
