@@ -11,7 +11,8 @@ class Form extends Component {
         mgroup: '',
     }    
 
-    state = this.initialState
+    state = this.props.evpn ? this.props.evpn : this.initialState;
+    index = this.props.index;
 
     handleChange = (event) => {
         const { name, value } = event.target
@@ -22,8 +23,8 @@ class Form extends Component {
     }
 
     submitForm = () => {        
-        this.props.handleSubmit(this.state);
-        this.setState(this.initialState)
+        this.props.handleSubmit(this.state, this.index);
+        this.setState(this.initialState)        
     }
 
     render() {

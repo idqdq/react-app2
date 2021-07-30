@@ -28,6 +28,7 @@ const TableBody = (props) => {
                 <td>{row.vrf}</td>
                 <td>{row.mgroup}</td>
                 <td>
+                    <button onClick={() => props.evpnEdit(index)}>Edit</button>
                     <button onClick={() => props.evpnRemove(index)}>Delete</button>
                 </td>
             </tr>
@@ -44,7 +45,7 @@ const Table = (props) => {
     return (
         <table>
             <TableHeader />
-            <TableBody evpnData={props.evpnData} evpnRemove={props.evpnRemove} />
+            <TableBody evpnData={props.evpnData} evpnEdit={props.evpnEdit} evpnRemove={props.evpnRemove}  />
         </table>
     )
 }

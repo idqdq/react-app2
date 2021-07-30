@@ -1,11 +1,29 @@
+
 import React, { Component } from 'react'
 import Table from './Table'
-import Form from './Form'
+//import Form from './Form'
+import MyModal from './Modal';
 
 class App extends Component {
     state = {
-        evpnData: [],
+        evpnData: [],        
+        isOpen: false,
+        areChanges: false,
     }
+
+    openModal = () => {
+        this.setState({
+            isOpen: true
+        });        
+    };
+
+    hideModal = () => {
+        this.setState({
+            isOpen: false
+        });
+        delete this.state.evpn;
+        delete this.state.index;
+    };
 
     evpnRemove = index => {
         const { evpnData } = this.state;
@@ -17,17 +35,36 @@ class App extends Component {
         });
     }
 
-    handleSubmit = evpn => {
-        this.setState({evpnData: [...this.state.evpnData, evpn]});
+    evpnEdit = index => {
+        this.setState({
+            evpn: this.state.evpnData[index], // temporary evpn data that serves both as a flag and a data
+            index: index,
+        })
+
+        this.openModal(index);
+    }
+    
+    handleSubmit = (evpn, index) => {
+        if (index != null) {
+            let newEvpnData = this.state.evpnData.slice();
+
+            newEvpnData[index] = evpn; // replace old evpn data with a new one in the array            
+            this.setState({ evpnData: newEvpnData });
+        }
+        else {
+            this.setState({ evpnData: [...this.state.evpnData, evpn] });
+        }
+        this.hideModal();
     }
 
     render() {
-        const { evpnData } = this.state
-
+        const { evpnData, evpn, index } = this.state
+         
         return (
             <div className="container">
-                <Table evpnData={evpnData} evpnRemove={this.evpnRemove} />
-                <Form handleSubmit={this.handleSubmit}/>
+                <Table evpnData={evpnData} evpnRemove={this.evpnRemove} evpnEdit={this.evpnEdit}/>
+                <button onClick={this.openModal}>New</button>
+                <MyModal evpn={evpn} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
             </div>
         )
     }
