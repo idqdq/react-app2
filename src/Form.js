@@ -9,13 +9,11 @@ class Form extends Component {
         svi_descr: '',
         vrf: '',
         mgroup: '',
-        errors: { 
-            vlan_id: '',
-            vni: ''},
+        errors: [],            
     }    
 
-    state = this.props.evpn ? this.props.evpn : this.initialState;
     index = this.props.index;
+    state = this.index ? this.props.evpn[this.index] : this.initialState;
     formValid = true;
 
     handleChange = (event) => {
@@ -40,11 +38,16 @@ class Form extends Component {
 
     validateField(name, value){        
         const errors = {};                
+        const IpAddrPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/(3[0-2]|[1-2][0-9]|[0-9])$)/;
+        const mcastIpAddrPattern = /^(22[4-9]|23[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
         switch(name) {
             case 'vlan_id':                
                 if(!(!isNaN(value) && value >1 && value < 4096)) {
                     errors[name] = 'should be a number from 1 to 4096';                    
+                }
+                else if (this.index && this.props.evpn.find(x => value===x.vlan_id)){
+                    errors[name] = 'vlan_id ' + value + ' already exist'; 
                 }
                 break;
 
@@ -52,12 +55,38 @@ class Form extends Component {
                 if(!(!isNaN(value) && value > 10000 && value < 10999)) {
                     errors[name] = 'should be a number from 10000 to 10999';                    
                 }
+                else if (this.index && this.props.evpn.find(x => value===x.vni)){
+                    errors[name] = 'vni ' + value + ' already exist'; 
+                }
+                break;
+            case 'vlan_name':
+                break;
+            case 'svi_ip':
+                if (value && !IpAddrPattern.test(value)) {
+                    errors[name] = 'must be a valid IP address with mask in CIDR notation e.g. 10.1.2.3/31'
+                }
+                break;
+            case 'svi_descr':
+                break;
+            case 'vrf':
+                break;
+            case 'mgroup':
+                if (value && !mcastIpAddrPattern.test(value)) {
+                    errors[name] = 'must be a valid mcast IP address (range 224.0.0.0 - 239.255.255.255)'
+                }
                 break;
             default:
                 break;
         }
         
-        this.setState({errors: errors});        
+        if (Object.keys(errors).length) {
+            this.setState({ errors: [...this.state.errors, errors] });
+        } else {
+            this.setState({ errors: this.state.errors.filter((el)=> {
+                return name !== Object.keys(el)[0];
+            })})
+        }
+
     }
 
     render() {
@@ -103,6 +132,7 @@ class Form extends Component {
                     placeholder="10.1.10.254/24"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{color: "red"}}>{this.state.errors["svi_ip"]}</span>
                 <label htmlFor="svi_descr">svi_descr</label>
                 <input
                     type="text"
@@ -130,7 +160,8 @@ class Form extends Component {
                     placeholder="231.0.0.10"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
-                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.formValid} />                
+                    <span style={{color: "red"}}>{this.state.errors["mgroup"]}</span>
+                <input type="button" value="Submit" onClick={this.submitForm} disabled={this.state.errors} />                
             </form>            
         );
     }

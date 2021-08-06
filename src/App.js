@@ -38,7 +38,7 @@ class App extends Component {
             index: index,
         })
 
-        this.openModal(index);
+        this.openModal();
     }
     
     handleSubmit = (evpn, index) => {
@@ -61,7 +61,7 @@ class App extends Component {
             <div className="container">
                 <Table evpnData={evpnData} evpnRemove={this.evpnRemove} evpnEdit={this.evpnEdit}/>
                 <button onClick={this.openModal}>New</button>
-                <MyModal evpn={evpnData[index]} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
+                <MyModal evpn={evpnData} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
             </div>
         )
     }

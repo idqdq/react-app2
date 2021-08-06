@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Form from './Form'
 
 const MyModal = (props) => {
-    const modalTitle = props.evpn ? 'Edit EVPN:' + props.evpn.vni : 'New EVPN';
+    const modalTitle = props.index && props.evpn[props.index] ? 'Edit EVPN:' + props.evpn[props.index].vni : 'New EVPN';
     return (
         <Modal show={props.isOpen}
             onHide={props.hideModal}
