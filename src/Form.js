@@ -9,12 +9,12 @@ class Form extends Component {
         svi_descr: '',
         vrf: '',
         mgroup: '',
-        errors: [],            
+        errors: {},   
+        formValid: false,         
     }    
 
     index = this.props.index;
-    state = this.index ? this.props.evpn[this.index] : this.initialState;
-    formValid = true;
+    state = (this.index!==undefined) ? this.props.evpn[this.index] : this.initialState;
 
     handleChange = (event) => {
         const { name, value } = event.target
@@ -27,8 +27,12 @@ class Form extends Component {
     handleBlur = (event) => {
         const { name, value } = event.target
 
-        this.setState({[name]: value,}, 
-            () => this.validateField(name, value))
+        //this.setState({ [name]: value, },() => 
+        this.validateField(name, value)
+
+        if (Object.keys(this.state.errors).length === 0) {
+            if (this.state.vlan_id && this.state.vni) this.setState({ formValid: true });
+        }
     }
 
     submitForm = () => {        
@@ -38,31 +42,35 @@ class Form extends Component {
 
     validateField(name, value){        
         const errors = {};                
-        const IpAddrPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/(3[0-2]|[1-2][0-9]|[0-9])$)/;
+        const cidrIpAddrPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/(3[0-2]|[1-2][0-9]|[0-9])$)/;
         const mcastIpAddrPattern = /^(22[4-9]|23[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
         switch(name) {
             case 'vlan_id':                
+                if (this.index!==undefined && this.props.evpn[this.index].vlan_id===value) 
+                    break;  //old value
                 if(!(!isNaN(value) && value >1 && value < 4096)) {
                     errors[name] = 'should be a number from 1 to 4096';                    
                 }
-                else if (this.index && this.props.evpn.find(x => value===x.vlan_id)){
+                else if (this.props.evpn.find(x => value===x.vlan_id)){
                     errors[name] = 'vlan_id ' + value + ' already exist'; 
                 }
                 break;
 
             case 'vni':
+                if (this.index!==undefined && this.props.evpn[this.index].vni===value) 
+                    break;  //old value
                 if(!(!isNaN(value) && value > 10000 && value < 10999)) {
                     errors[name] = 'should be a number from 10000 to 10999';                    
                 }
-                else if (this.index && this.props.evpn.find(x => value===x.vni)){
+                else if (this.props.evpn.find(x => value===x.vni)){
                     errors[name] = 'vni ' + value + ' already exist'; 
                 }
                 break;
             case 'vlan_name':
                 break;
             case 'svi_ip':
-                if (value && !IpAddrPattern.test(value)) {
+                if (value && !cidrIpAddrPattern.test(value)) {
                     errors[name] = 'must be a valid IP address with mask in CIDR notation e.g. 10.1.2.3/31'
                 }
                 break;
@@ -80,11 +88,14 @@ class Form extends Component {
         }
         
         if (Object.keys(errors).length) {
-            this.setState({ errors: [...this.state.errors, errors] });
+            this.setState({ errors: {...this.state.errors, ...errors }});
+            this.setState({ formValid: false });
         } else {
-            this.setState({ errors: this.state.errors.filter((el)=> {
-                return name !== Object.keys(el)[0];
-            })})
+            if (this.state.errors[name]) {
+                let newerrors = { ...this.state.errors };
+                delete newerrors[name];
+                this.setState({ errors: newerrors });
+            }
         }
 
     }
@@ -161,7 +172,7 @@ class Form extends Component {
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
                     <span style={{color: "red"}}>{this.state.errors["mgroup"]}</span>
-                <input type="button" value="Submit" onClick={this.submitForm} disabled={this.state.errors} />                
+                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} />                
             </form>            
         );
     }
