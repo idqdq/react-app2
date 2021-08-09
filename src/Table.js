@@ -9,8 +9,10 @@ const TableHeader = () => {
                 <th>vlan name</th>
                 <th>svi ip</th>
                 <th>svi descr</th>
+                <th>mtu</th>
                 <th>vrf</th>
                 <th>mgroup</th>
+                <th>arp suppression</th>
             </tr>
         </thead>
     )
@@ -25,8 +27,10 @@ const TableBody = (props) => {
                 <td>{row.vlan_name}</td>
                 <td>{row.svi_ip}</td>
                 <td>{row.svi_descr}</td>
+                <td>{row.mtu}</td>
                 <td>{row.vrf}</td>
                 <td>{row.mgroup}</td>
+                <td>{row.arpsup ? "on": "off"}</td>
                 <td>
                     <button onClick={() => props.evpnEdit(index)}>Edit</button>
                     <button onClick={() => props.evpnRemove(index)}>Delete</button>

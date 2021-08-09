@@ -7,8 +7,10 @@ class Form extends Component {
         vlan_name: '',
         svi_ip: '',
         svi_descr: '',
+        mtu: '',
         vrf: '',
         mgroup: '',
+        arpsup: false,
         errors: {},   
         formValid: false,         
     }    
@@ -24,6 +26,11 @@ class Form extends Component {
         })
     }
 
+    handleClickArpSup = () => { 
+        this.setState( prevState => ({            
+            arpsup: !prevState.arpsup,
+        }));
+    }
     handleBlur = (event) => {
         const { name, value } = event.target
 
@@ -49,8 +56,8 @@ class Form extends Component {
             case 'vlan_id':                
                 if (this.index!==undefined && this.props.evpn[this.index].vlan_id===value) 
                     break;  //old value
-                if(!(!isNaN(value) && value >1 && value < 4096)) {
-                    errors[name] = 'should be a number from 1 to 4096';                    
+                if(!(!isNaN(value) && value > 1 && value < 4096)) {
+                    errors[name] = 'should be a number from 2 to 4096';                    
                 }
                 else if (this.props.evpn.find(x => value===x.vlan_id)){
                     errors[name] = 'vlan_id ' + value + ' already exist'; 
@@ -75,6 +82,11 @@ class Form extends Component {
                 }
                 break;
             case 'svi_descr':
+                break;
+            case 'mtu':                                
+                if(!(!isNaN(value) && value >=1280 && value <= 9216)) {
+                    errors[name] = 'should be a number from 1280 to 9216';                    
+                }          
                 break;
             case 'vrf':
                 break;
@@ -101,11 +113,11 @@ class Form extends Component {
     }
 
     render() {
-        const { vlan_id, vni, vlan_name, svi_ip, svi_descr, vrf, mgroup } = this.state;
+        const { vlan_id, vni, vlan_name, svi_ip, svi_descr, mtu, vrf, mgroup, arpsup } = this.state;
 
         return (            
             <form>                
-                <label htmlFor="vlan_id">vlan_id</label>
+                <label htmlFor="vlan">vni</label>
                 <input
                     type="number"
                     name="vlan_id"
@@ -114,6 +126,7 @@ class Form extends Component {
                     placeholder="10"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><i>regular vlan number (range 1-4096)</i></small></span>
                     <span style={{color: "red"}}>{this.state.errors["vlan_id"]}</span>
                 <label htmlFor="vni">vni</label>
                 <input
@@ -124,7 +137,8 @@ class Form extends Component {
                     placeholder="10010"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
-                    <span style={{color: "red"}}>{this.state.errors["vni"]}</span>
+                    <span style={{display: "block"}}><small className="form-text text-muted"><i>vxlan identifier (range 10000-10999)</i></small></span>  
+                    <span style={{color: "red"}}>{this.state.errors["vni"]}</span>                            
                 <label htmlFor="vlan_name">vlan_name</label>
                 <input
                     type="text"
@@ -134,6 +148,7 @@ class Form extends Component {
                     placeholder="vlan10"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
                 <label htmlFor="svi_ip">svi_ip</label>
                 <input
                     type="text"
@@ -143,6 +158,7 @@ class Form extends Component {
                     placeholder="10.1.10.254/24"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>IPv4 address in CIDR format e.g. a.b.c.d/x</i></small></span>
                     <span style={{color: "red"}}>{this.state.errors["svi_ip"]}</span>
                 <label htmlFor="svi_descr">svi_descr</label>
                 <input
@@ -150,9 +166,20 @@ class Form extends Component {
                     name="svi_descr"
                     id="svi_descr"
                     value={svi_descr}
-                    placeholder="test10 subnet"
+                    placeholder="svi10"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
+                <label htmlFor="mtu">mtu</label>
+                <input
+                    type="number"
+                    name="mtu"
+                    id="mtu"
+                    value={mtu}
+                    placeholder="1500"
+                    onChange={this.handleChange}
+                    onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>default 1500</i></small></span>
                 <label htmlFor="vrf">vrf</label>
                 <input
                     type="text"
@@ -162,7 +189,8 @@ class Form extends Component {
                     placeholder="Tenant-1"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
-                <label htmlFor="mgroup">mgroup</label>
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>default Tenant-1</i></small></span>
+                <label htmlFor="mgroup">mgroup</label>                
                 <input
                     type="text"
                     name="mgroup"
@@ -171,7 +199,15 @@ class Form extends Component {
                     placeholder="231.0.0.10"
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
+                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
                     <span style={{color: "red"}}>{this.state.errors["mgroup"]}</span>
+                <label htmlFor="arpsup">Arp suppression</label>
+                <input type="checkbox"
+                    name="arpsup"
+                    id="arpsup"
+                    checked={arpsup}
+                    onChange={this.handleClickArpSup}/>        
+                <div></div>
                 <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} />                
             </form>            
         );
