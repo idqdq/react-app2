@@ -3,11 +3,19 @@ import React, { Component } from 'react'
 import Table from './Table'
 import MyModal from './Modal';
 
+const URL = "http://127.0.0.1:8000/getEvpnAll"
 class App extends Component {
     state = {
         evpnData: [],        
         isOpen: false,
         areChanges: false,
+        isFetching: true,
+    }
+
+    async componentDidMount(){
+        const response = await fetch(URL);
+        const data = await response.json();
+        this.setState({ evpnData: data.evpnData, isFetching: false })
     }
 
     openModal = () => {

@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 
 class Form extends Component {
+       
     initialState = {
+        //evpn: {
         vlan_id: '',
         vni: '',
         vlan_name: '',
@@ -11,12 +13,19 @@ class Form extends Component {
         vrf: '',
         mgroup: '',
         arpsup: false,
-        errors: {},   
-        formValid: false,         
-    }    
+        //},
+        errors: {},
+        formValid: false,
+    }
 
-    index = this.props.index;
+    index = this.props.index;        
     state = (this.index!==undefined) ? this.props.evpn[this.index] : this.initialState;
+
+    constructor(props){
+        super(props);        
+        this.state.errors = {};
+        this.state.formValid = false;
+    }
 
     handleChange = (event) => {
         const { name, value } = event.target
@@ -109,7 +118,6 @@ class Form extends Component {
                 this.setState({ errors: newerrors });
             }
         }
-
     }
 
     render() {
