@@ -122,7 +122,7 @@ class Form extends Component {
     }
 
     render() {
-        const { vlan_id, vni, vlan_name, svi_ip, svi_descr, mtu, vrf, mgroup, arpsup } = this.state;
+        const { vlan_id, vni, vlan_name, svi_ip, svi_descr, mtu, vrf, mgroup, arpsup } = this.state.evpn;
 
         return (            
             <form>                
@@ -189,6 +189,7 @@ class Form extends Component {
                     onChange={this.handleChange}
                     onBlur = {this.handleBlur} />
                     <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>default 1500</i></small></span>
+                    <span style={{color: "red"}}>{this.state.errors["mtu"]}</span>
                 <label htmlFor="vrf">vrf</label>
                 <input
                     type="text"
