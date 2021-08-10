@@ -3,56 +3,58 @@ import React, { Component } from 'react'
 class Form extends Component {
        
     initialState = {
-        //evpn: {
-        vlan_id: '',
-        vni: '',
-        vlan_name: '',
-        svi_ip: '',
-        svi_descr: '',
-        mtu: '',
-        vrf: '',
-        mgroup: '',
-        arpsup: false,
-        //},
+        evpn: {
+            vlan_id: '',
+            vni: '',
+            vlan_name: '',
+            svi_ip: '',
+            svi_descr: '',
+            mtu: '',
+            vrf: '',
+            mgroup: '',
+            arpsup: false,
+        },
         errors: {},
         formValid: false,
     }
 
     index = this.props.index;        
-    state = (this.index!==undefined) ? this.props.evpn[this.index] : this.initialState;
+    state = this.initialState;
+    //state = (this.index!==undefined) ? this.props.evpn[this.index] : this.initialState;
 
     constructor(props){
         super(props);        
-        this.state.errors = {};
-        this.state.formValid = false;
+        if (this.index!==undefined) {
+            this.state.evpn = this.props.evpn[this.index];
+        }
     }
 
     handleChange = (event) => {
         const { name, value } = event.target
 
-        this.setState({
-            [name]: value,
+        this.setState({ 
+            evpn: { ...this.state.evpn, [name]: value }
         })
     }
 
     handleClickArpSup = () => { 
-        this.setState( prevState => ({            
-            arpsup: !prevState.arpsup,
+        this.setState( prevState => ({  
+            evpn: { ...this.state.evpn, arpsup: !prevState.arpsup }
         }));
     }
+
     handleBlur = (event) => {
         const { name, value } = event.target
-
-        //this.setState({ [name]: value, },() => 
+        
         this.validateField(name, value)
 
         if (Object.keys(this.state.errors).length === 0) {
-            if (this.state.vlan_id && this.state.vni) this.setState({ formValid: true });
+            if (this.state.evpn.vlan_id && this.state.evpn.vni) this.setState({ formValid: true });
         }
     }
 
     submitForm = () => {        
-        this.props.handleSubmit(this.state, this.index);
+        this.props.handleSubmit(this.state.evpn, this.index);
         this.setState(this.initialState)        
     }
 
