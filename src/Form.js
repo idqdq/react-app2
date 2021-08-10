@@ -19,8 +19,7 @@ class Form extends Component {
     }
 
     index = this.props.index;        
-    state = this.initialState;
-    //state = (this.index!==undefined) ? this.props.evpn[this.index] : this.initialState;
+    state = this.initialState;    
 
     constructor(props){
         super(props);        
