@@ -38,15 +38,19 @@ class Form extends Component {
 
     handleClickArpSup = () => { 
         this.setState( prevState => ({  
-            evpn: { ...this.state.evpn, arpsup: !prevState.arpsup }
+            evpn: { ...this.state.evpn, arpsup: !prevState.evpn.arpsup }
         }));
+        this.isFormValid(); 
     }
 
     handleBlur = (event) => {
         const { name, value } = event.target
         
-        this.validateField(name, value)
+        this.validateField(name, value);
+        this.isFormValid();        
+    }
 
+    isFormValid = () => {
         if (Object.keys(this.state.errors).length === 0) {
             if (this.state.evpn.vlan_id && this.state.evpn.vni) this.setState({ formValid: true });
         }
